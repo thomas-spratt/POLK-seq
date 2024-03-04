@@ -1,0 +1,32 @@
+#!/bin/batch -l
+#SBATCH --job-name=mbs
+#SBATCH --output=results_%j.txt
+#SBATCH --error=error_%j.txt
+#SBATCH --ntasks=1
+#SBATCH --time=40:00:00
+#SBATCH -p compute
+#SBATCH -A lab_spratt
+
+# Sbatch Script to create multibamsummary files from deeptools 
+# The directory will contain all the bam files
+
+module load bedtools
+module load deeptools
+
+BL=/gpfs/location/blacklist.bed
+
+# create file  with 100bp windows 
+bedtools makewindows -g hg38.genome.size -w 100 > genome.100.window
+multiBamSummary BED-file --BED genome.100.window \
+                         --bamfiles *.bam \
+                         --blackListFileName $BL \
+                         --extendReads \
+                         --outRawCounts MBS.EBndG.100.100bp.txt  \
+
+# create file with 50K windows 
+bedtools makewindows -g hg38.genome.size -w 50000 > genome.50K.window
+multiBamSummary BED-file --BED genome.50K.window \
+                         --bamfiles *.bam \
+                         --blackListFileName $BL \
+                         --extendReads \
+                         --outRawCounts MBS.EBndG.100.50K.txt  \
